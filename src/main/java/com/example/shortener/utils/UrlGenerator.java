@@ -13,7 +13,7 @@ public class UrlGenerator {
     public static final UrlGenerator INSTANCE = new UrlGenerator();
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int BASE = ALPHABET.length();
-    private static final String URL_BASE = "https://me.li/";
+    private static final String URL_DOMAIN = "https://me.li/";
     private static final int ID_LENGTH = 6;
 
     /**
@@ -21,7 +21,7 @@ public class UrlGenerator {
      * @return complete short URL as a String
      */
     public String generateShortUrl() {
-        return URL_BASE + generateShortUrlKey();
+        return URL_DOMAIN + generateShortUrlKey();
     }
 
     /**
