@@ -13,6 +13,7 @@ Shorten URLs.
 * [API Reference](#api-reference)
 * [Run Locally](#run-locally)
 * [Running Tests](#running-tests)
+* [Architecture](#architecture)
 * [Feedback](#feedback)
 * [Badges](#badges)
 
