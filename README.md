@@ -3,12 +3,18 @@
 
 Shorten URLs.
 
-![GitHub last commit](https://img.shields.io/github/last-commit/rodrisu/url-shortener)
-
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/rodrisu/url-shortener)
 
 
 
+
+## Table of contents
+* [Features](#features)
+* [Tech](#tech)
+* [API Reference](#api-reference)
+* [Run Locally](#run-locally)
+* [Running Tests](#running-tests)
+* [Feedback](#feedback)
+* [Badges](#badges)
 
 ## Features
 
@@ -101,9 +107,29 @@ Shorten URLs.
 
 ### Steps
 
-**Some other steps that will be written soon**
+Start DynamoDB Local in a Docker container
 
-Then,
+```bash
+  docker run -dp 8000:8000 amazon/dynamodb-local
+```
+
+Create the DynamoDB table
+
+```bash
+  aws dynamodb create-table --table-name UrlsTable
+    --attribute-definitions AttributeName=key,AttributeType=S 
+    --key-schema AttributeName=key,KeyType=HASH
+    --billing-mode PAY_PER_REQUEST
+    --endpoint-url http://localhost:8000
+    --region us-east-1
+```
+
+Start Redis in a Docker container
+
+```bash
+  docker run -dp 16379:6379 redis:6.0 redis-server --requirepass "mypass"
+```
+
 Clone the project
 
 ```bash
@@ -140,7 +166,26 @@ We use `JUnit` for testing our code. To run tests, run the following command
 ```
 
 
+## Architecture
+
+### Ideally would be
+
+![Ideal Architecture](https://i.ibb.co/N2vQJm4/URLShortener-drawio.png)
+
+
 ## Feedback
 
 If you have any feedback, please reach out to me at serron.rodrigo@gmail.com
+
+
+## Badges
+
+![GitHub last commit](https://img.shields.io/github/last-commit/rodrisu/url-shortener)
+
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/rodrisu/url-shortener)
+
+![GitHub watchers](https://img.shields.io/github/watchers/rodrisu/url-shortener)
+
+![GitHub all releases](https://img.shields.io/github/downloads/rodrisu/url-shortener/total)
+
 
