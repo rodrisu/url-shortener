@@ -1,0 +1,12 @@
+version: '3'
+services:
+  dynamodb-local:
+    image: amazon/dynamodb-local
+    ports:
+      - '8000:8000'
+
+  redis:
+    image: redis:6.0
+    command: redis-server --requirepass "mypass"
+    ports:
+      - '16379:6379'

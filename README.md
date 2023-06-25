@@ -9,7 +9,7 @@ Shorten URLs.
 
 ## Table of contents
 * [Features](#features)
-* [Tech](#tech)
+* [Tech Stack](#tech-stack)
 * [API Reference](#api-reference)
 * [Run Locally](#run-locally)
 * [Running Tests](#running-tests)
@@ -108,48 +108,40 @@ Shorten URLs.
 
 ### Steps
 
-Start DynamoDB Local in a Docker container
-
-```bash
-  docker run -dp 8000:8000 amazon/dynamodb-local
-```
-
-Create the DynamoDB table
-
-```bash
-  aws dynamodb create-table --table-name UrlsTable
-    --attribute-definitions AttributeName=key,AttributeType=S 
-    --key-schema AttributeName=key,KeyType=HASH
-    --billing-mode PAY_PER_REQUEST
-    --endpoint-url http://localhost:8000
-    --region us-east-1
-```
-
-Start Redis in a Docker container
-
-```bash
-  docker run -dp 16379:6379 redis:6.0 redis-server --requirepass "mypass"
-```
-
-Clone the project
+1. Clone the project
 
 ```bash
   git clone https://github.com/rodrisu/url-shortener.git
 ```
 
-Go to the project directory
+2. Go to the project directory
 
 ```bash
   cd url-shortener
 ```
 
-Install dependencies
+4. Install dependencies
 
 ```bash
   mvn install
 ```
 
-Start the server
+5. Start Docker
+
+
+6. Run Docker Compose to set up DynamoDB and Redis in Docker
+
+```bash
+  docker compose up -d
+```
+
+7. Create the DynamoDB table running the following bash script. It is mandatory to pass the **table_name**, **endpoint_url** and **region**.
+
+```bash
+  ./create_dynamodb_table.sh UrlsTable http://localhost:8000 us-east-1
+```
+
+8. Start the server
 
 ```bash
   mvn spring-boot:run
