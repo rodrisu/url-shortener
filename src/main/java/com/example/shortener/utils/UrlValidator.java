@@ -21,7 +21,8 @@ public class UrlValidator {
      * - (:[0-9]{1,5})? : Matches an optional colon followed by one to five digits for the port number.
      * - (/\\S*)?$ : Matches an optional path, starting with a forward slash (/), followed by any non-whitespace characters.
      */
-    private static final String URL_REGEX = "^(https?://)?(www\\.)?([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}(:[0-9]{1,5})?(/\\S*)?$";
+    private static final String URL_REGEX = "^(https?://)?(www\\.)?([a-zA-Z0-9-]+\\.){1,}[a-zA-Z]{2,}(:\\d{1,5})?(/\\S*)?$";
+
     private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
 
     public boolean validateURL(String url) {

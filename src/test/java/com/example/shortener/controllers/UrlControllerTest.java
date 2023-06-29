@@ -150,7 +150,7 @@ class UrlControllerTest {
 
         verify(urlService, times(1)).deleteShortUrl(shortUrlKey);
         verifyNoMoreInteractions(urlService);
-        assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
     @Test
@@ -163,7 +163,7 @@ class UrlControllerTest {
 
         verify(urlService, times(1)).deleteShortUrl(shortUrlKey);
         verifyNoMoreInteractions(urlService);
-        assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test

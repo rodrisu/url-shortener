@@ -135,10 +135,10 @@ Shorten URLs.
   docker compose up -d
 ```
 
-7. Create the DynamoDB table running the following bash script. It is mandatory to pass the **table_name**, **endpoint_url** and **region**.
+7. Create the DynamoDB table running the following bash script.
 
 ```bash
-  ./create_dynamodb_table.sh UrlsTable http://localhost:8000 us-east-1
+  ./create_dynamodb_table.sh
 ```
 
 8. Start the server

@@ -1,6 +1,5 @@
 package com.example.shortener.configuration;
 
-import com.example.shortener.entities.Url;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,8 +13,8 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 public class RedisConfig {
 
     @Bean
-    public RedisTemplate<String, Url> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Url> template = new RedisTemplate<>();
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;

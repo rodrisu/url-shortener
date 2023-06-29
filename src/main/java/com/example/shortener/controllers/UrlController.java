@@ -29,9 +29,13 @@ import java.util.Arrays;
 public class UrlController {
 
     private final UrlService urlService;
+    private static final String EXCEPTION_STACK_TRACE_MESSAGE = "Exception Stack Trace: {}";
+    private static final String EXCEPTION_MESSAGE = "Exception message: {}";
+    private static final String RECEIVED_VALUE = "Received value: {}";
+
 
     @PostMapping(value = "/urls", consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<?> shortenUrl(@RequestBody UrlDTO urlDTO) {
+    public ResponseEntity<ResponseDTO> shortenUrl(@RequestBody UrlDTO urlDTO) {
         log.info("Received body: {}", urlDTO.toString());
         try {
             return new ResponseEntity<>(
@@ -42,70 +46,70 @@ public class UrlController {
                             .build()
             , HttpStatus.CREATED);
         } catch (ServiceException e) {
-            log.warn("Exception Stack Trace: {}", Arrays.toString(e.getStackTrace()));
+            log.warn(EXCEPTION_STACK_TRACE_MESSAGE, Arrays.toString(e.getStackTrace()));
             return createErrorResponse(e.getMessage());
         } catch (ValidationException e) {
-            log.warn("Exception message: {}", e.getMessage());
+            log.warn(EXCEPTION_MESSAGE, e.getMessage());
             return createBadRequestResponse(e.getMessage(), urlDTO.getUrl());
         }
 
     }
 
     @GetMapping(value = "/urls/{shortUrlKey}", produces = {"application/json"})
-    public ResponseEntity<?> getLongUrl(@PathVariable("shortUrlKey") String shortUrlKey) {
-        log.info("Received value: {}", shortUrlKey);
+    public ResponseEntity<ResponseDTO> getLongUrl(@PathVariable("shortUrlKey") String shortUrlKey) {
+        log.info(RECEIVED_VALUE, shortUrlKey);
         try {
             String longUrl = urlService.getLongUrl(shortUrlKey);
             return createSuccessResponse(longUrl);
         } catch (NotFoundException n){
-            log.warn("Exception message: {}", n.getMessage());
+            log.warn(EXCEPTION_MESSAGE, n.getMessage());
             return createNotFoundResponse(n.getMessage(), shortUrlKey);
         } catch (ServiceException e) {
-            log.warn("Exception Stack Trace: {}", Arrays.toString(e.getStackTrace()));
+            log.warn(EXCEPTION_STACK_TRACE_MESSAGE, Arrays.toString(e.getStackTrace()));
             return createErrorResponse(e.getMessage());
         }
     }
 
     @DeleteMapping(value = "/urls/{shortUrlKey}", produces = {"application/json"})
-    public ResponseEntity<?> deleteShortUrl(@PathVariable String shortUrlKey) {
-        log.info("Received value: {}", shortUrlKey);
+    public ResponseEntity<ResponseDTO> deleteShortUrl(@PathVariable String shortUrlKey) {
+        log.info(RECEIVED_VALUE, shortUrlKey);
         try {
             urlService.deleteShortUrl(shortUrlKey);
             return ResponseEntity.ok().build();
         } catch (ServiceException e) {
-            log.warn("Exception Stack Trace: {}", Arrays.toString(e.getStackTrace()));
+            log.warn(EXCEPTION_STACK_TRACE_MESSAGE, Arrays.toString(e.getStackTrace()));
             return createErrorResponse(e.getMessage());
         } catch (NotFoundException n){
-            log.warn("Exception message: {}", n.getMessage());
+            log.warn(EXCEPTION_MESSAGE, n.getMessage());
             return createNotFoundResponse(n.getMessage(), shortUrlKey);
         }
     }
 
     @GetMapping(value = "/urls/{shortUrlKey}/statistics", produces = {"application/json"})
     public ResponseEntity<?> getStatistics(@PathVariable String shortUrlKey) {
-        log.info("Received value: {}", shortUrlKey);
+        log.info(RECEIVED_VALUE, shortUrlKey);
         try {
             UrlDTO statistics = urlService.getStatistics(shortUrlKey);
             return ResponseEntity.ok(statistics);
         } catch (NotFoundException n){
-            log.warn("Exception message: {}", n.getMessage());
+            log.warn(EXCEPTION_MESSAGE, n.getMessage());
             return createNotFoundResponse(n.getMessage(), shortUrlKey);
         }
     }
 
     @GetMapping(value = "/{shortUrlKey}")
     public RedirectView redirectUrl(@PathVariable String shortUrlKey, @RequestHeader("User-Agent") String userAgent) {
-        log.info("Received value: {}", shortUrlKey);
+        log.info(RECEIVED_VALUE, shortUrlKey);
         RedirectView redirectView;
         try {
             redirectView = urlService.redirectView(shortUrlKey, userAgent);
             redirectView.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
             return redirectView;
         } catch (ServiceException e) {
-            log.warn("Exception Stack Trace: {}", Arrays.toString(e.getStackTrace()));
+            log.warn(EXCEPTION_STACK_TRACE_MESSAGE, Arrays.toString(e.getStackTrace()));
             return new RedirectView("/error");
         } catch (NotFoundException n) {
-            log.warn("Exception message: {}", n.getMessage());
+            log.warn(EXCEPTION_MESSAGE, n.getMessage());
             return new RedirectView("/not-found");
         }
     }

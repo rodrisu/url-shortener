@@ -13,7 +13,7 @@ public class UrlGenerator {
     public static final UrlGenerator INSTANCE = new UrlGenerator();
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     private static final int BASE = ALPHABET.length();
-    private static final String URL_DOMAIN = "https://me.li/";
+    private static final String URL_DOMAIN = "https://cut.it/";
     private static final int ID_LENGTH = 6;
 
     /**

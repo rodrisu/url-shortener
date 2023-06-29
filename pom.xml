@@ -8,14 +8,20 @@
 		<version>2.7.12</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.example</groupId>
 	<artifactId>url-shortener</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>url-shortener</name>
 	<description>Demo project for URL Shortener</description>
+
 	<properties>
 		<java.version>11</java.version>
+		<aws-sdk.version>2.20.68</aws-sdk.version>
+		<junit-jupiter.version>5.4.0</junit-jupiter.version>
+		<lombok.version>1.18.26</lombok.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -28,13 +34,13 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>5.4.0</version>
+			<version>${junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.26</version>
+			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -47,12 +53,12 @@
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>sdk-core</artifactId>
-			<version>2.20.68</version>
+			<version>${aws-sdk.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>dynamodb-enhanced</artifactId>
-			<version>2.20.68</version>
+			<version>${aws-sdk.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>software.amazon.awssdk</groupId>
@@ -66,8 +72,8 @@
 		</dependency>
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>url-connection-client</artifactId>
-			<version>2.20.68</version>
+			<artifactId>dynamodb</artifactId>
+			<version>${aws-sdk.version}</version>
 		</dependency>
     </dependencies>
 

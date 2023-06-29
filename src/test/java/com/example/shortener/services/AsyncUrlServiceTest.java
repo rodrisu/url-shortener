@@ -4,6 +4,7 @@ import com.example.shortener.entities.Url;
 import com.example.shortener.exceptions.ServiceException;
 import com.example.shortener.repositories.RedisRepository;
 import com.example.shortener.repositories.UrlRepository;
+import com.example.shortener.services.impl.AsyncUrlServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -14,15 +15,17 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class AsyncUrlServiceTest {
 
@@ -37,22 +40,21 @@ class AsyncUrlServiceTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        asyncUrlService = new AsyncUrlService(urlRepository, redisRepository);
+        asyncUrlService = new AsyncUrlServiceImpl(urlRepository, redisRepository);
     }
 
     @Test
-    void updateStatistics_ShouldUpdateUrlStatisticsAndSaveInRedis() throws IOException {
+    void updateStatistics_ShouldUpdateUrlStatistics() throws IOException {
         Url url = buildUrl();
         String userAgent = "Mozilla/5.0";
         long duration = 1000L;
 
+        when(urlRepository.getUrl(url.getKey())).thenReturn(Optional.of(url));
         doNothing().when(urlRepository).update(any(Url.class));
-        doNothing().when(redisRepository).save(any(Url.class));
 
-        asyncUrlService.updateStatistics(url, userAgent, duration);
+        asyncUrlService.updateStatistics(url.getKey(), userAgent, duration);
 
         verify(urlRepository, times(1)).update(url);
-        verify(redisRepository, times(1)).save(url);
         assertEquals(1, url.getTotalClicks());
         assertEquals(1, url.getDatesWhenClicked().size());
         assertEquals(1, url.getWebExplorers().size());
@@ -67,24 +69,22 @@ class AsyncUrlServiceTest {
         String userAgent = "Mozilla/5.0";
         long duration = 1000L;
 
+        when(urlRepository.getUrl(url.getKey())).thenReturn(Optional.of(url));
         doThrow(DynamoDbException.class).when(urlRepository).update(any(Url.class));
 
-        assertThrows(ServiceException.class, () -> asyncUrlService.updateStatistics(url, userAgent, duration));
-        verify(redisRepository, never()).save(any(Url.class));
-    }
+        assertThrows(ServiceException.class, () -> asyncUrlService.updateStatistics(url.getKey(), userAgent, duration));}
 
     @Test
-    void updateDurationPostRequest_ShouldUpdateUrlDurationOfCreationAndSaveInRedis() throws ServiceException {
+    void updateDurationPostRequest_ShouldUpdateUrlDurationOfCreation() throws ServiceException {
         Url url = buildUrl();
         long duration = 2000L;
 
+        when(urlRepository.getUrl(url.getKey())).thenReturn(Optional.of(url));
         doNothing().when(urlRepository).update(any(Url.class));
-        doNothing().when(redisRepository).save(any(Url.class));
 
         asyncUrlService.updateDurationPostRequest(url, duration);
 
         verify(urlRepository, times(1)).update(url);
-        verify(redisRepository, times(1)).save(url);
         assertEquals(duration, url.getDurationOfCreation());
     }
 
@@ -96,22 +96,20 @@ class AsyncUrlServiceTest {
         doThrow(DynamoDbException.class).when(urlRepository).update(any(Url.class));
 
         assertThrows(ServiceException.class, () -> asyncUrlService.updateDurationPostRequest(url, duration));
-        verify(redisRepository, never()).save(any(Url.class));
     }
 
     @Test
-    void updateDurationOfGettingLongUrl_ShouldUpdateUrlDurationOfGettingLongUrlAndSaveInRedis() throws ServiceException {
+    void updateDurationOfGettingLongUrl_ShouldUpdateUrlDurationOfGettingLongUrl() throws ServiceException {
         Url url = buildUrl();
         String dateTime = LocalDateTime.now().toString();
         long duration = 3000L;
 
+        when(urlRepository.getUrl(url.getKey())).thenReturn(Optional.of(url));
         doNothing().when(urlRepository).update(any(Url.class));
-        doNothing().when(redisRepository).save(any(Url.class));
 
-        asyncUrlService.updateDurationOfGettingLongUrl(url, dateTime, duration);
+        asyncUrlService.updateDurationOfGettingLongUrl(url.getKey(), dateTime, duration);
 
         verify(urlRepository, times(1)).update(url);
-        verify(redisRepository, times(1)).save(url);
         assertEquals(1, url.getDurationOfGettingLongUrl().size());
         assertEquals(duration, url.getDurationOfGettingLongUrl().get(dateTime).longValue());
     }
@@ -122,21 +120,21 @@ class AsyncUrlServiceTest {
         String dateTime = LocalDateTime.now().toString();
         long duration = 3000L;
 
+        when(urlRepository.getUrl(url.getKey())).thenReturn(Optional.of(url));
         doThrow(DynamoDbException.class).when(urlRepository).update(any(Url.class));
 
-        assertThrows(ServiceException.class, () -> asyncUrlService.updateDurationOfGettingLongUrl(url, dateTime, duration));
-        verify(redisRepository, never()).save(any(Url.class));
+        assertThrows(ServiceException.class, () -> asyncUrlService.updateDurationOfGettingLongUrl(url.getKey(), dateTime, duration));
     }
 
     @Test
     void saveInRedis_ShouldSaveUrlInRedisRepository() {
         Url url = new Url();
 
-        doNothing().when(redisRepository).save(any(Url.class));
+        doNothing().when(redisRepository).save(anyString(), anyString());
 
-        asyncUrlService.saveInRedis(url);
+        asyncUrlService.saveInRedis(url.getKey(), url.getLongUrl());
 
-        verify(redisRepository, times(1)).save(url);
+        verify(redisRepository, times(1)).save(url.getKey(), url.getLongUrl());
     }
 
     @Test

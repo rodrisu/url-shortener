@@ -7,6 +7,7 @@ import com.example.shortener.exceptions.ServiceException;
 import com.example.shortener.exceptions.ValidationException;
 import com.example.shortener.repositories.RedisRepository;
 import com.example.shortener.repositories.UrlRepository;
+import com.example.shortener.services.impl.UrlServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -44,7 +45,7 @@ class UrlServiceTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        urlService = new UrlService(urlRepository, redisRepository, asyncUrlService);
+        urlService = new UrlServiceImpl(urlRepository, redisRepository, asyncUrlService);
     }
 
 
@@ -61,7 +62,7 @@ class UrlServiceTest {
 
         assertNotNull(result);
         verify(urlRepository, times(1)).save(any(Url.class));
-        verify(asyncUrlService, times(1)).saveInRedis(any(Url.class));
+        verify(asyncUrlService, times(1)).saveInRedis(anyString(), anyString());
     }
 
     @Test
@@ -71,7 +72,7 @@ class UrlServiceTest {
         assertThrows(ValidationException.class, () -> urlService.shortenUrl(longUrl));
         verify(urlRepository, never()).getUrl(anyString());
         verify(urlRepository, never()).save(any(Url.class));
-        verify(asyncUrlService, never()).saveInRedis(any(Url.class));
+        verify(asyncUrlService, never()).saveInRedis(anyString(), anyString());
     }
 
     @Test
@@ -81,7 +82,7 @@ class UrlServiceTest {
         assertThrows(ValidationException.class, () -> urlService.shortenUrl(longUrl));
         verify(urlRepository, never()).getUrl(anyString());
         verify(urlRepository, never()).save(any(Url.class));
-        verify(asyncUrlService, never()).saveInRedis(any(Url.class));
+        verify(asyncUrlService, never()).saveInRedis(anyString(), anyString());
     }
 
     @Test
@@ -92,7 +93,7 @@ class UrlServiceTest {
 
         assertThrows(ServiceException.class, () -> urlService.shortenUrl(longUrl));
         verify(urlRepository, never()).save(any(Url.class));
-        verify(asyncUrlService, never()).saveInRedis(any(Url.class));
+        verify(asyncUrlService, never()).saveInRedis(anyString(), anyString());
     }
 
     @Test
@@ -109,7 +110,7 @@ class UrlServiceTest {
 
         assertNotNull(result);
         assertEquals(url.getLongUrl(), result);
-        verify(asyncUrlService, times(1)).updateDurationOfGettingLongUrl(any(Url.class), anyString(), anyLong());
+        verify(asyncUrlService, times(1)).updateDurationOfGettingLongUrl(anyString(), anyString(), anyLong());
     }
 
     @Test
@@ -120,7 +121,7 @@ class UrlServiceTest {
         when(urlRepository.getUrl(shortUrlKey)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> urlService.getLongUrl(shortUrlKey));
-        verify(asyncUrlService, never()).updateDurationOfGettingLongUrl(any(Url.class), anyString(), anyLong());
+        verify(asyncUrlService, never()).updateDurationOfGettingLongUrl(anyString(), anyString(), anyLong());
     }
 
     @Test
@@ -162,7 +163,7 @@ class UrlServiceTest {
 
         assertNotNull(redirectView);
         assertEquals(url.getLongUrl(), redirectView.getUrl());
-        verify(asyncUrlService, times(1)).updateStatistics(any(Url.class), anyString(), anyLong());
+        verify(asyncUrlService, times(1)).updateStatistics(anyString(), anyString(), anyLong());
     }
 
     @Test
@@ -173,7 +174,7 @@ class UrlServiceTest {
         when(urlRepository.getUrl(shortUrlKey)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> urlService.redirectView(shortUrlKey, userAgent));
-        verify(asyncUrlService, never()).updateStatistics(any(Url.class), anyString(), anyLong());
+        verify(asyncUrlService, never()).updateStatistics(anyString(), anyString(), anyLong());
     }
 
     @Test
@@ -183,23 +184,19 @@ class UrlServiceTest {
                 .longUrl("https://www.google.com")
                 .build();
 
-        when(redisRepository.findByKey(anyString())).thenReturn(null);
         when(urlRepository.getUrl(anyString())).thenReturn(Optional.of(url));
 
         UrlDTO urlDTO = urlService.getStatistics(shortUrlKey);
 
         assertNotNull(urlDTO);
-        verify(asyncUrlService, times(1)).saveInRedis(any(Url.class));
     }
 
     @Test
     void getStatistics_NonExistingShortUrlKey_ShouldThrowNotFoundException() {
         String shortUrlKey = "aBc123";
 
-        when(redisRepository.findByKey(shortUrlKey)).thenReturn(null);
         when(urlRepository.getUrl(shortUrlKey)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> urlService.getStatistics(shortUrlKey));
-        verify(asyncUrlService, never()).saveInRedis(any(Url.class));
     }
 }
